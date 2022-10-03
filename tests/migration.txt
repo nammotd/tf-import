@@ -1,0 +1,4 @@
+aws_ssm_document.sing SSM-Singapore ap-southeast-1
+aws_ssm_document.tokyo SSM-Tokyo ap-northeast-1
+aws_ssm_document.vir SSM-Virginia us-east-1
+aws_ssm_document.eu SSM-eu eu-central-1
