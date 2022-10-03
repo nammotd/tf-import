@@ -4,7 +4,7 @@
 -   Support only AWS resources currently
 
 ### How to prepare an address file
-- There is an example (migration.txt)[tests/migration.txt]
+- There is an example [migration.txt](tests/migration.txt)
 - Explain:
     -   the file contains 3 components:
         -   the terraform resources address (this needs to be explicit since you design your own modules)
@@ -20,3 +20,7 @@
 
 ### How to run
 - checkout `run_test.sh`
+- run `go build`, it will generates an executable file called `tf-import`
+
+### How to run
+- checkout [run_test.sh](./run_test.sh)
