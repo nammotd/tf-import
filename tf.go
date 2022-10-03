@@ -48,6 +48,7 @@ var workingDir string
 var addrFile string
 var savedFile string
 var terraformVersion string
+var indicator string
 var help bool
 
 func main() {
@@ -55,6 +56,7 @@ func main() {
     flag.StringVar(&addrFile, "addr-file", "", "")
     flag.StringVar(&savedFile, "saved-file", "imported.txt", "")
     flag.StringVar(&terraformVersion, "terraform-version", "1.1.6", "")
+    flag.StringVar(&indicator, "indicator", " ", "")
     flag.BoolVar(&help, "help", false, ``)
     flag.Parse()
   
@@ -65,6 +67,7 @@ tf-import command supports importing existing resources into Terraform state.
 Parameters:
   --working-dir: Required, the directory to run Terraform import
   --addr-file: Required, the addresses file for Terraform to refer
+  --indicator: Optaionl, the spliter between elements in address file, default value is a white space
   --saved-file: Optional, the file to saved imported resources, default value is imported.txt
   --terraform-version: Optional, the addresses file for Terraform to refer, default value is 1.1.6, 
 `)
@@ -88,6 +91,11 @@ Parameters:
 		log.Fatalf("error running NewTerraform: %s", err)
 	}
 
+    err = tf.Init(context.Background(), tfexec.Upgrade(true))
+	if err != nil {
+		log.Fatalf("error running Init: %s", err)
+	}
+
 	file, err := os.Open(addrFilePath)
 	if err != nil {
 		log.Fatal(err)
@@ -96,12 +104,13 @@ Parameters:
 
 	readLines := bufio.NewScanner(file)
 	for readLines.Scan() {
-		resource := strings.Split(readLines.Text(), " ")
-		if len(resource) != 2 {
+		resource := strings.Split(readLines.Text(), indicator)
+		if len(resource) != 3 {
 			log.Fatalf("Indicator is not properly configured, should only return 2 elements per line")
 		}
 		rAddr := &resource[0]
 		rId := &resource[1]
+        region := &resource[2]
 
 		bold := color.New(color.Bold).SprintFunc()
 		_, ok := importedResources[*rAddr]
@@ -110,7 +119,18 @@ Parameters:
 			continue
 		}
 
+        os.Setenv("AWS_DEFAULT_REGION", *region)
 		plan := tf.Import(context.Background(), *rAddr, *rId)
+            // Backup("testbackup"),
+			// LockTimeout("200s"),
+			// State("teststate"),
+			// StateOut("teststateout"),
+			// VarFile("testvarfile"),
+			// Lock(false),
+			// Var("var1=foo"),
+			// Var("var2=bar"),
+			// AllowMissingConfig(true),
+
 		if plan == nil {
 			color.Green("[+] %s => IMPORTED", bold(readLines.Text()))
 			saveImported(*rAddr, savedFilePath)
