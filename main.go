@@ -82,6 +82,8 @@ Parameters:
 		Product: product.Terraform,
 		Version: version.Must(version.NewVersion(terraformVersion)),
 	}
+    bold := color.New(color.Bold).SprintFunc()
+	color.White(bold("Installing Terraform version ", terraformVersion))
 	execPath, err := installer.Install(context.Background())
 	if err != nil {
 		log.Fatalf("error installing Terraform: %s", err)
@@ -91,6 +93,7 @@ Parameters:
 		log.Fatalf("error running NewTerraform: %s", err)
 	}
 
+	color.White(bold("Terraform init"))
     err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
 		log.Fatalf("error running Init: %s", err)
@@ -102,6 +105,7 @@ Parameters:
 	}
 	defer file.Close()
 
+	color.White(bold("Terraform import\n"))
 	readLines := bufio.NewScanner(file)
 	for readLines.Scan() {
 		resource := strings.Split(readLines.Text(), indicator)
@@ -112,7 +116,6 @@ Parameters:
 		rId := &resource[1]
         region := &resource[2]
 
-		bold := color.New(color.Bold).SprintFunc()
 		_, ok := importedResources[*rAddr]
 		if ok == true {
 			color.Blue("[+] %s => IGNORED | %s already managed by Terraform", bold(readLines.Text()), bold(*rAddr))
