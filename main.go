@@ -110,7 +110,7 @@ Parameters:
 	for readLines.Scan() {
 		resource := strings.Split(readLines.Text(), indicator)
 		if len(resource) != 3 {
-			log.Fatalf("Indicator is not properly configured, should only return 2 elements per line")
+			log.Fatalf("Indicator is not properly configured, should only return 3 elements per line")
 		}
 		rAddr := &resource[0]
 		rId := &resource[1]
@@ -149,7 +149,7 @@ Parameters:
 				color.Blue("[+] %s => IGNORED | %s does not exist", bold(readLines.Text()), bold(*rId))
 				saveImported(*rAddr, savedFilePath)
 			default:
-				color.Red("[+] %s => FAILED | %s", bold(readLines.Text()), *cause)
+				color.Red("[+] %s => FAILED | %s", bold(readLines.Text()), plan.Error())
 			}
 		}
 	}
